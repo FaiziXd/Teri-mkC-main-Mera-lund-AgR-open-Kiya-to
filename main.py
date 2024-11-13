@@ -1,15 +1,4 @@
-import requests
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-import time
 from flask import Flask, render_template_string, request
-
-# Facebook Graph API credentials
-APP_ID = "YOUR_APP_ID"
-APP_SECRET = "YOUR_APP_SECRET"
 
 # Email credentials (add 30 email addresses)
 EMAILS = [
@@ -26,30 +15,6 @@ PASSWORD = "FAIZU H3R2"
 
 # Flask setup
 app = Flask(__name__)
-
-# Browser setup for Selenium (run only when necessary)
-driver = webdriver.Chrome()
-
-def create_account(email, password):
-    driver.get("https://www.facebook.com/")
-    WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[@name='u_0_2_WB']"))).click()
-    driver.find_element_by_name("firstname").send_keys("Faizu Here")  # Name set to Faizu Here
-    driver.find_element_by_name("lastname").send_keys("Here")  # Name set to Faizu Here
-    driver.find_element_by_name("reg_email__").send_keys(email)
-    driver.find_element_by_name("reg_passwd__").send_keys(password)
-    driver.find_element_by_name("birthday_day").send_keys("12")
-    driver.find_element_by_name("birthday_month").send_keys("May")
-    driver.find_element_by_name("birthday_year").send_keys("1990")
-    driver.find_element_by_xpath("//button[@name='u_0_2_WB']").click()
-    time.sleep(5)  # Adding a delay to avoid overwhelming the server
-
-def generate_accounts():
-    created_accounts = []
-    for email in EMAILS:
-        create_account(email, PASSWORD)
-        created_accounts.append((email, PASSWORD))  # Store the email and password
-        print(f"Account created for {email}")
-    return created_accounts
 
 @app.route('/')
 def index():
@@ -72,7 +37,7 @@ def index():
 
 @app.route('/generate', methods=['POST'])
 def generate():
-    created_accounts = generate_accounts()
+    created_accounts = [(email, PASSWORD) for email in EMAILS]
     return render_template_string("""
     <!DOCTYPE html>
     <html lang="en">
